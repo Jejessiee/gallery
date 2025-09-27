@@ -152,15 +152,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.2"
-  image_gallery_saver:
+  image_gallery_saver_plus:
     dependency: "direct main"
     description:
-      path: "."
-      ref: master
-      resolved-ref: "8c6480bf3a07834df89525e7ac6e0196ec701f73"
-      url: "https://github.com/hui-z/image_gallery_saver.git"
-    source: git
-    version: "2.0.3"
+      name: image_gallery_saver_plus
+      sha256: "199b9e24f8d85e98f11e3d35571ab68ae50626ad40e2bb85c84383f69a6950ad"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.1"
   image_picker:
     dependency: "direct main"
     description:

@@ -5,7 +5,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'models.dart';
@@ -37,30 +37,40 @@ class _EditorPageState extends State<EditorPage> {
   }
 
   Future<void> _saveImage() async {
-    // Ambil widget boundary
-    final boundary =
-    _repaintKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
-    if (boundary == null) return;
+    try {
+      // Ambil widget boundary
+      final boundary =
+      _repaintKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      if (boundary == null) return;
 
-    // Render ke gambar PNG
-    final ui.Image img = await boundary.toImage(pixelRatio: 3.0);
-    final byteData = await img.toByteData(format: ui.ImageByteFormat.png);
-    final pngBytes = byteData!.buffer.asUint8List();
+      // Render ke gambar PNG
+      final ui.Image img = await boundary.toImage(pixelRatio: 3.0);
+      final byteData = await img.toByteData(format: ui.ImageByteFormat.png);
 
-    // Simpan sementara ke file
-    final dir = await getTemporaryDirectory();
-    final file = File(
-        '${dir.path}/annotated_${DateTime.now().millisecondsSinceEpoch}.png');
-    await file.writeAsBytes(pngBytes);
+      // Periksa jika byteData null
+      if (byteData == null) return;
 
-    // Simpan ke galeri (menggunakan saveFile!)
-    final result = await ImageGallerySaver.saveFile(file.path);
-    debugPrint('Save result: $result');
+      final pngBytes = byteData.buffer.asUint8List();
 
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Saved to Gallery!')),
-    );
+      // Simpan ke galeri menggunakan saveImage (lebih direkomendasikan untuk byte)
+      final result = await ImageGallerySaverPlus.saveImage(
+        pngBytes,
+        quality: 80, // Opsional: atur kualitas
+        name: "annotated_${DateTime.now().millisecondsSinceEpoch}", // Opsional: beri nama file
+      );
+      debugPrint('Save result: $result');
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Saved to Gallery!')),
+      );
+    } catch (e) {
+      debugPrint('Error saving image: $e');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error saving image: $e')),
+      );
+    }
   }
 
   void _onPanUpdate(DragUpdateDetails details, BoxConstraints constraints) {
